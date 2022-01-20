@@ -1,3 +1,4 @@
+import 'package:examination_training/model/paper.dart';
 import 'package:flutter/material.dart';
 
 const years = [
@@ -18,12 +19,6 @@ const years = [
     'value': '2018',
   }
 ];
-
-enum SubjectType {
-  Reserve,
-  Math,
-  Science
-}
 
 const subjects = [
   {
