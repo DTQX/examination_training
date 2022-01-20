@@ -2,7 +2,7 @@ import './route_path.dart';
 import './test_paper/do_test_paper.dart';
 import 'package:flutter/material.dart';
 
-import 'test_paper/select_test_paper.dart';
+import 'test_paper/select/select_paper.dart';
 
 void main() {
   runApp(MyApp());
