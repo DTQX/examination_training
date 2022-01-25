@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "ant-design-vue": "^2.2.8",
+    "axios": "^0.25.0",
     "core-js": "^3.6.5",
+    "uuid": "^8.3.2",
     "vue": "^3.0.0"
   },
   "devDependencies": {
@@ -29,8 +31,7 @@
       "node": true
     },
     "extends": [
-      "plugin:vue/vue3-essential",
-      "eslint:recommended"
+      "plugin:vue/vue3-essential"
     ],
     "parserOptions": {
       "parser": "babel-eslint"
