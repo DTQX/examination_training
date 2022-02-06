@@ -1,1 +1,40 @@
+message BaseRes{
+    int32 code = 1;
+    string msg = 2;
+
+}
+
+message TestPaper{
+    string _id = 1;
+    string name = 2;
+    string region = 2;
+    int32 year = 2;
+    string subject = 2;
+    int32 score = 2;
+    int32 duration = 2;
+    [] questions = 2;
+    string name = 2;
+    string name = 2;
+    string name = 2;
+    string name = 2;
+
+}
+
+
+message ReqOfGetTestPaper{
+    string _id = 1;
+}
+
+message ResOfGetTestPaper{
+    int32 code = 1;
+    string msg = 2;
+
+}
+service TestPaper{
+    rpc  GetTestPaper() return (){
+        option (google.api.http)={
+            post:"get_test_paper"
+        }
+    }
+}
 
