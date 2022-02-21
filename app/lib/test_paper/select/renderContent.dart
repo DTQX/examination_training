@@ -1,10 +1,11 @@
+import 'package:examination_training/api/paper.dart';
 import 'package:examination_training/model/paper.dart';
 import 'package:examination_training/test_paper/select/renderForm.dart';
 import 'package:flutter/material.dart';
 
 import '../../route_path.dart';
 
-import 'package:examination_training/mock/papers.dart';
+// import 'package:examination_training/mock/papers.dart';
 class RenderContent extends StatefulWidget {
   RenderContent({Key key}) : super(key: key);
 
@@ -26,9 +27,17 @@ class _RenderContentState extends State<RenderContent> {
   }
 
   _getPapers () async {
-    var ps = await getMockPaper();
+    print('==> get papers');
+    
+    var ps = [];
+    try {
+      ps = await queryPaperList('33');
+      print('==> get papers ${ps.toString()}');
+    } catch (e) {
+      print('====>>>> ${e.toString()}');
+    }
     setState(() {
-      papers = ps;
+      papers = ps.map((dynamic item) => Paper.formJson(item)).toList();
     });
   }
 
@@ -79,12 +88,12 @@ class _RenderContentState extends State<RenderContent> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Container(
-            child: Text(paper.title, style: TextStyle(fontSize: 16, color: Colors.black))
+            child: Text(paper.name, style: TextStyle(fontSize: 16, color: Colors.black))
           ),
           Container(
             child: Row(
               children: [
-                Text(paper.year),
+                Text(paper.year.toString()),
                 Icon(Icons.arrow_forward_ios, size: 14)
               ]
             )

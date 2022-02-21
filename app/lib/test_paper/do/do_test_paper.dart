@@ -1,8 +1,9 @@
+import 'dart:ffi';
+
 import 'package:camera/camera.dart';
+import 'package:examination_training/api/paper.dart';
 import 'package:examination_training/model/paper.dart';
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 
 class DoTestPaper extends StatefulWidget {
 
@@ -17,6 +18,7 @@ class _DoTestPaperState extends State<DoTestPaper> {
   Question question;
   List<CameraDescription> cameras;
   CameraController controller;
+  bool showCamera = false;
 
   @override
   initState() {
@@ -26,16 +28,19 @@ class _DoTestPaperState extends State<DoTestPaper> {
 
   @override
   dispose() {
-    controller.dispose();
+    controller?.dispose();
     super.dispose();
+  }
+
+  _getQs () async {
+    var p = await getPaperDetail(paper.id);
+    print('====>>>> p: $p');
   }
   
   _getCameras () async {
     cameras = await availableCameras();
-    print('====>${cameras.length}');
     if (cameras != null && cameras.length > 0) {
       controller = CameraController(cameras[0], ResolutionPreset.max);
-      print('====>${cameras.length},${controller.cameraId}');
     }
   }
 
@@ -45,11 +50,22 @@ class _DoTestPaperState extends State<DoTestPaper> {
   _handleSubmit () async {
     if (controller == null) {
       await _getCameras();
+      if (controller == null) {
+        return;
+      }
     }
     await controller.initialize();
-    // final path = join((await getTemporaryDirectory()).path, 'pic.png');
-    final file = await controller.takePicture();
-    print(file.name);
+    setState(() {
+      showCamera = true;
+    });
+  }
+  _takePic () async {
+    final XFile file = await controller.takePicture();
+    print('file:${file.name}-${file.length()}');
+    file.saveTo('./');
+    setState(() {
+      showCamera = false;
+    });
   }
   _handlePrev () {
     if (activeIndex != 0) {
@@ -59,7 +75,7 @@ class _DoTestPaperState extends State<DoTestPaper> {
     }
   }
   _handleNext () {
-    if ((activeIndex + 1) != paper.qs.length) {
+    if ((activeIndex + 1) != paper.questions.length) {
       setState(() {
         activeIndex += 1;
       });
@@ -69,14 +85,40 @@ class _DoTestPaperState extends State<DoTestPaper> {
   @override
   Widget build(BuildContext context) {
     paper = ModalRoute.of(context).settings.arguments;
-    question = paper.qs[activeIndex];
+    _getQs();
+    print('build:$paper');
+    if (paper.questions != null && paper.questions.length > 0) {
+      question = paper.questions[activeIndex];
+    }
 
+    if (showCamera) {
+      return CameraPreview(
+        controller,
+        child: Positioned(
+          bottom: 16,
+          left: 0,
+          right: 0,
+          child: Center(
+            child: FloatingActionButton(
+              onPressed: _takePic,
+              child: Icon(Icons.add_a_photo_rounded, size: 48)
+            )
+          )
+        )
+      );
+    }
+
+    return renderContent(context);
+  }
+
+  renderContent (BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
       body: Container(
         child: Column(
           children: [
-            renderQuestion(context, question)
+            question != null ? renderQuestion(context, question) : Container(),
+            renderAnswer(context)
           ]
         )
       ),
@@ -107,18 +149,22 @@ class _DoTestPaperState extends State<DoTestPaper> {
   renderQuestion(BuildContext context, Question q) {
 
     return Container(
-      child: Column(
-        children: [
-          Container(
-            padding: EdgeInsets.all(8),
-            alignment: Alignment.centerLeft,
-            child: Text('${activeIndex + 1}、${q.title}'),
-          ),
-          ...q.content.map((c) => Container(
-            child: Image(image: AssetImage(c))
-          )).toList()
-        ]
-      )
+      padding: EdgeInsets.all(8),
+      alignment: Alignment.centerLeft,
+      child: Image(image: AssetImage(q.qUrl)),
+    );
+  }
+
+  renderAnswer (BuildContext context) {
+    return Column(
+      // mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Container(
+          alignment: Alignment.centerLeft,
+          child: Text('答案')
+        ),
+        Image(image: AssetImage('images/p1.png'))
+      ]
     );
   }
 }
