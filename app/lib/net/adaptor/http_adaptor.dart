@@ -11,9 +11,13 @@ class HttpAdapter extends NetAdapter {
     var res, err;
 
     var url = Uri.parse(req.Url());
-    try {
+    var data = req.data();
 
-      res = await http.post(url, headers: req.headers, body: req.data());
+    // if (req.headers['Content-Type'] == 'multipart/form-data') {
+    //   data = http.MultipartFile.fromString('myFile', data);
+    // }
+    try {
+      res = await http.post(url, headers: req.headers, body: data);
       print('11====>>> ${json.decode(res.body)['data']}');
     } catch (e) {
       err = e;

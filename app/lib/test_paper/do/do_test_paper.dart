@@ -1,9 +1,12 @@
-import 'dart:ffi';
+import 'dart:async';
+import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:examination_training/api/paper.dart';
+import 'package:examination_training/api/common.dart';
 import 'package:examination_training/model/paper.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 
 class DoTestPaper extends StatefulWidget {
 
@@ -19,21 +22,37 @@ class _DoTestPaperState extends State<DoTestPaper> {
   List<CameraDescription> cameras;
   CameraController controller;
   bool showCamera = false;
+  Timer _timer;
+  int currentTime = 0;
+  File image;
 
   @override
   initState() {
     super.initState();
     _getCameras();
+    _initTimer();
   }
 
   @override
   dispose() {
     controller?.dispose();
     super.dispose();
+    _timer?.cancel();
   }
 
-  _getQs () async {
-    var p = await getPaperDetail(paper.id);
+  _initTimer () {
+    _timer = Timer.periodic(Duration(milliseconds: 1000), (timer) {
+      if (currentTime > 100) {
+        _timer.cancel();
+      }
+      setState(() {
+        currentTime++;
+      });
+    });
+  }
+
+  _getQs (String id) async {
+    var p = await getPaperDetail(id);
     print('====>>>> p: $p');
   }
   
@@ -61,10 +80,13 @@ class _DoTestPaperState extends State<DoTestPaper> {
   }
   _takePic () async {
     final XFile file = await controller.takePicture();
-    print('file:${file.name}-${file.length()}');
-    file.saveTo('./');
+    final File imageFile = File(file.path);
+    print('imageFile:${imageFile.path}');
+    // file.saveTo('./');
+    // uploadFile(file.toString());
     setState(() {
       showCamera = false;
+      image = imageFile;
     });
   }
   _handlePrev () {
@@ -84,9 +106,12 @@ class _DoTestPaperState extends State<DoTestPaper> {
 
   @override
   Widget build(BuildContext context) {
-    paper = ModalRoute.of(context).settings.arguments;
-    _getQs();
-    print('build:$paper');
+    Paper pa = ModalRoute.of(context).settings.arguments;
+    print('build:$pa');
+    if (paper == null) {
+      _getQs(pa.id);
+      paper = pa;
+    }
     if (paper.questions != null && paper.questions.length > 0) {
       question = paper.questions[activeIndex];
     }
@@ -113,7 +138,9 @@ class _DoTestPaperState extends State<DoTestPaper> {
 
   renderContent (BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        actions: [Text(currentTime.toString())] 
+      ),
       body: Container(
         child: Column(
           children: [
@@ -163,7 +190,7 @@ class _DoTestPaperState extends State<DoTestPaper> {
           alignment: Alignment.centerLeft,
           child: Text('答案')
         ),
-        Image(image: AssetImage('images/p1.png'))
+        image != null ? Image.file(image) : Text('answer')
       ]
     );
   }

@@ -1,4 +1,3 @@
-import 'package:examination_training/model/paper.dart';
 import 'package:examination_training/net/net.dart';
 import 'package:examination_training/net/request.dart';
 
