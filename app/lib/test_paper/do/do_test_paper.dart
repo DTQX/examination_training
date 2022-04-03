@@ -6,7 +6,6 @@ import 'package:examination_training/api/paper.dart';
 import 'package:examination_training/api/common.dart';
 import 'package:examination_training/model/paper.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 
 class DoTestPaper extends StatefulWidget {
 
@@ -52,8 +51,14 @@ class _DoTestPaperState extends State<DoTestPaper> {
   }
 
   _getQs (String id) async {
-    var p = await getPaperDetail(id);
-    print('====>>>> p: $p');
+    dynamic p = await getPaperDetail(id);
+    Paper pp = Paper.fromJson(p);
+    List qs = p['questions'];
+    pp.questions = qs.map((q) => Question.fromJson(q)).toList();
+
+    setState(() {
+      paper = pp;
+    });
   }
   
   _getCameras () async {
@@ -81,9 +86,8 @@ class _DoTestPaperState extends State<DoTestPaper> {
   _takePic () async {
     final XFile file = await controller.takePicture();
     final File imageFile = File(file.path);
-    print('imageFile:${imageFile.path}');
-    // file.saveTo('./');
-    // uploadFile(file.toString());
+    final f = await uploadFile(imageFile);
+    print('========= file upload res ==========: ${f.toString()}');
     setState(() {
       showCamera = false;
       image = imageFile;
@@ -107,7 +111,6 @@ class _DoTestPaperState extends State<DoTestPaper> {
   @override
   Widget build(BuildContext context) {
     Paper pa = ModalRoute.of(context).settings.arguments;
-    print('build:$pa');
     if (paper == null) {
       _getQs(pa.id);
       paper = pa;
@@ -142,9 +145,9 @@ class _DoTestPaperState extends State<DoTestPaper> {
         actions: [Text(currentTime.toString())] 
       ),
       body: Container(
-        child: Column(
+        child: ListView(
           children: [
-            question != null ? renderQuestion(context, question) : Container(),
+            renderQuestion(),
             renderAnswer(context)
           ]
         )
@@ -173,12 +176,19 @@ class _DoTestPaperState extends State<DoTestPaper> {
     );
   }
 
-  renderQuestion(BuildContext context, Question q) {
+  renderQuestion() {
+
+    if (paper == null || paper.questions == null || paper.questions.length <= 0) {
+      print('qs empty');
+      return Container();
+    }
+    Question q = paper.questions[activeIndex];
+
 
     return Container(
       padding: EdgeInsets.all(8),
       alignment: Alignment.centerLeft,
-      child: Image(image: AssetImage(q.qUrl)),
+      child: Image.network(q.qUrl),
     );
   }
 
@@ -190,7 +200,15 @@ class _DoTestPaperState extends State<DoTestPaper> {
           alignment: Alignment.centerLeft,
           child: Text('答案')
         ),
-        image != null ? Image.file(image) : Text('answer')
+        image != null ?
+          Image.file(image, width: 300, height: 600)
+          :
+          Container(
+            decoration: BoxDecoration(border: Border.all(color: Colors.grey[300]), borderRadius: BorderRadius.all(Radius.circular(8))),
+            width: 300,
+            height: 600,
+            child: Text('请上传答案')
+          )
       ]
     );
   }

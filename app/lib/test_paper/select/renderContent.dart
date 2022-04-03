@@ -37,7 +37,7 @@ class _RenderContentState extends State<RenderContent> {
       print('====>>>> ${e.toString()}');
     }
     setState(() {
-      papers = ps.map((dynamic item) => Paper.formJson(item)).toList();
+      papers = ps.map((dynamic item) => Paper.fromJson(item)).toList();
     });
   }
 

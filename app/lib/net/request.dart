@@ -2,6 +2,10 @@ abstract class NetRequest {
 
   bool useHttps = true;
 
+  NetRequest() {
+    this.addHeader("Content-Type", "application/json");
+  }
+
   String domain () {
     return 'qchtxq.api.cloudendpoint.cn';
   }

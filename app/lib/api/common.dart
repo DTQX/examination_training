@@ -1,6 +1,8 @@
+import 'dart:io';
+
 import 'package:examination_training/net/net.dart';
 import 'package:examination_training/net/request.dart';
-import 'package:http/http.dart';
+import 'package:http/http.dart' as http;
 
 class CommonRequest extends NetRequest {
 
@@ -21,11 +23,16 @@ class CommonRequest extends NetRequest {
 }
 
 // 获取试卷列表
-Future uploadFile (String file) {
+Future uploadFile (File file) async {
 
-  print('enet start: $file');
+  print('net start upload: $file');
+
+  var data = await http.MultipartFile.fromPath(
+    "myFile",
+    file.path
+  );
   
-  NetRequest req = CommonRequest('/file_upload', file);
+  NetRequest req = CommonRequest('/file_upload', data);
   req.addHeader('Content-Type', 'multipart/form-data');
 
   return Net.getInstance().send<Object>(req);

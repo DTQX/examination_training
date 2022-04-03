@@ -19,16 +19,12 @@ class Paper {
 
   Paper(this.id, this.name, this.year, this.subject, this.questions);
 
-  static Paper formJson (Map json) {
+  static Paper fromJson (Map json) {
     String _id = json['_id'];
     String _name = json['name'];
     int _year = json['year'];
     String _subject = json['subject'];
-    // List qs = json['questions'];
-    // if (qs == null) {
-    //   qs = [];
-    // }
-    // print('===>>>>>4${qs}');
+    List qs = json['questions'];
     return Paper(_id, _name, _year, _subject, []);
   }
 }
@@ -46,7 +42,7 @@ class Question {
     this.aUrl
   );
 
-  static Question formJson (Map json) {
+  static Question fromJson (Map json) {
     String _id = json['_id'];
     String _subject = json['subject'];
     String _qUrl = json['qUrl'];
