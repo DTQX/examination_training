@@ -1,3 +1,5 @@
+import 'dart:io';
+
 abstract class NetRequest {
 
   bool useHttps = true;
@@ -11,7 +13,8 @@ abstract class NetRequest {
   }
 
   String path();
-  Object data();
+  dynamic data();
+  File file();
 
   String Url () {
     Uri uri;

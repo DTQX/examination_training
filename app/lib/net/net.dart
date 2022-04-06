@@ -28,11 +28,32 @@ class Net {
     return response.data;
   }
 
+  Future<T> sendFile<T>(NetRequest req) async {
+    NetResponse<T> response;
+    var err;
+    try {
+      response = await sendFileByAdapter<T>(req);
+    } catch (e) {
+      err = e;
+    }
+    print("err${err}");
+    print("response:${response}");
+
+    return response.data;
+  }
+
   Future sendByAdapter<T> (NetRequest req) async {
 
     NetAdapter ad = HttpAdapter();
 
     return ad.send<T>(req);
+  }
+
+  Future sendFileByAdapter<T> (NetRequest req) async {
+
+    NetAdapter ad = HttpAdapter();
+
+    return ad.sendFile<T>(req);
   }
 
 }

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:examination_training/net/net.dart';
 import 'package:examination_training/net/request.dart';
 
@@ -5,6 +7,7 @@ class PaperRequest extends NetRequest {
 
   dynamic d;
   String p;
+  File f;
 
   PaperRequest(this.p, this.d);
 
@@ -16,6 +19,11 @@ class PaperRequest extends NetRequest {
   @override
   String path() {
     return p;
+  }
+
+  @override
+  File file() {
+    return f;
   }
 }
 

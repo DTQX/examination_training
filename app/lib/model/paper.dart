@@ -24,7 +24,6 @@ class Paper {
     String _name = json['name'];
     int _year = json['year'];
     String _subject = json['subject'];
-    List qs = json['questions'];
     return Paper(_id, _name, _year, _subject, []);
   }
 }
@@ -34,6 +33,7 @@ class Question {
   String qUrl;
   String subject;
   String aUrl;
+  int dur = 0;
 
   Question(
     this.id,
